@@ -3,7 +3,7 @@
     <div class="card">
       <div class="card-header">
         <div class="flex items-center justify-between">
-          <p class="card-title">Waikiki提醒您</p>
+          <p class="card-title">云挂机提醒您</p>
         </div>
       </div>
       <div class="card-body text-base leading-6">
@@ -138,7 +138,7 @@ export default {
 
     const getQrcode = async () => {
       // 增加扫码是否禁用判断
-      if (this.showQR) {
+      if (data.showQR) {
         try {
           const body = await getQrcodeAPI()
           data.token = body.data.token

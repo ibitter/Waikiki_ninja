@@ -243,20 +243,20 @@ module.exports = class User {
     if (remarks) {
       this.remark = remarks.match(/remark=(.*?);/) && remarks.match(/remark=(.*?);/)[1];
     }
-    let isSetWskey = false;
+    let isSetWsck = false;
     let wseid = '';
     const pin = env.value.match(/pt_pin=(.*?);/) && env.value.match(/pt_pin=(.*?);/)[1];
     const wscks = await getWSCKEnvs();
     const wsck = await wscks.find((item) => item.value.match(/pin=(.*?);/)[1] === pin);
     if (wsck) {
-      isSetWskey = true;
+      isSetWsck = true;
       wseid = wsck._id;
     }
     await this.#getNickname();
     return {
       nickName: this.nickName,
       eid: this.eid,
-      isSetWskey: isSetWskey,
+      isSetWskey: isSetWsck,
       wseid: wseid,
       timestamp: this.timestamp,
       remark: this.remark,

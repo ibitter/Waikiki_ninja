@@ -107,7 +107,7 @@ export default {
       }
       if (eid) {
         const userInfo = await getUserInfoAPI(eid)
-        if (!userInfo.data.eid) {
+        if (userInfo.code == 230) {
           ElMessage.error('获取用户信息失败，请重新登录')
           logout()
           return

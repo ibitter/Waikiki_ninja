@@ -166,12 +166,8 @@ export default {
     }
     
     const WSCKLogin = async () => {
-      const wskey =
-        data.jdwsck.match(/wskey=(.*?);/) &&
-        data.jdwsck.match(/wskey=(.*?);/)[1]
-      const pin =
-        data.jdwsck.match(/pin=(.*?);/) &&
-        data.jdwsck.match(/pin=(.*?);/)[1]
+      const wskey = data.jdwsck.match(/wskey=(.*?);/) && data.jdwsck.match(/wskey=(.*?);/)[1]
+      const pin = data.jdwsck.match(/pin=(.*?);/) && data.jdwsck.match(/pin=(.*?);/)[1]
       if (wskey && pin) {
         const body = await WSCKLoginAPI({ wskey: wskey, pin: pin })
         if (body.data.wseid) {

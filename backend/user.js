@@ -256,7 +256,7 @@ module.exports = class User {
     return {
       nickName: this.nickName,
       eid: this.eid,
-      isSetWskey: isSetWsck,
+      isSetWsck: isSetWsck,
       wseid: wseid,
       timestamp: this.timestamp,
       remark: this.remark,

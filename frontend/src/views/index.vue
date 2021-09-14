@@ -31,7 +31,7 @@
       <div class="card-body text-center">
         <el-input v-model="jdwsck" placeholder="pin=xxxxxx;wskey=xxxxxxxxxx;" size="small" clearable class="my-4 w-full" />
       </div>
-      <div v-if="!isSetWskey" class="card-footer">
+      <div v-if="!isSetWsck" class="card-footer">
         <el-button type="success" size="small" auto @click="WSCKLogin">录入</el-button>
       </div>
       <div v-else class="card-footer">
@@ -95,7 +95,7 @@ export default {
       jdwsck: undefined,
       nickName: undefined,
       timestamp: undefined,
-      isSetWskey: false,
+      isSetWsck: false,
     })
 
     const getInfo = async () => {
@@ -113,9 +113,9 @@ export default {
           return
         }
         data.nickName = userInfo.data.nickName
-        data.isSetWskey = userInfo.data.isSetWskey
+        data.isSetWsck = userInfo.data.isSetWsck
         data.timestamp = new Date(userInfo.data.timestamp).toLocaleString()
-        if (data.isSetWskey && !wseid) {
+        if (data.isSetWsck && !wseid) {
           wseid = userInfo.data.wseid
           localStorage.setItem('wseid', wseid)
         }

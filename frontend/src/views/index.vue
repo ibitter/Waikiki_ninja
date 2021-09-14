@@ -31,7 +31,10 @@
       <div class="card-body text-center">
         <el-input v-model="jdwsck" placeholder="pin=xxxxxx;wskey=xxxxxxxxxx;" size="small" clearable class="my-4 w-full" />
       </div>
-      <div class="card-footer">
+      <div v-if="!isSetWskey" class="card-footer">
+        <el-button type="success" size="small" auto @click="WSCKLogin">录入</el-button>
+      </div>
+      <div v-else class="card-footer">
         <el-button type="success" size="small" auto @click="WSCKLogin">重新录入</el-button>
         <el-button type="danger" size="small" auto @click="delWSCKAccount">删除WSCK</el-button>
       </div>
@@ -92,6 +95,7 @@ export default {
       jdwsck: undefined,
       nickName: undefined,
       timestamp: undefined,
+      isSetWskey: false,
     })
 
     const getInfo = async () => {
@@ -104,23 +108,17 @@ export default {
       if (eid) {
         const userInfo = await getUserInfoAPI(eid)
         if (!userInfo) {
-          ElMessage.error('获取用户CK信息失败，请重重新登录')
+          ElMessage.error('获取用户信息失败，请重新登录')
           logout()
           return
         }
         data.nickName = userInfo.data.nickName
+        data.isSetWskey = userInfo.data.isSetWskey
         data.timestamp = new Date(userInfo.data.timestamp).toLocaleString()
-      }
-      
-      if (wseid) {
-        const userInfo = await getWSCKUserinfoAPI(wseid)
-        if (!userInfo) {
-          ElMessage.error('获取用户WSCK信息失败，请重重新登录')
-          logout()
-          return
+        if (data.isSetWskey && !wseid) {
+          wseid = userInfo.data.wseid
+          localStorage.setItem('wseid', wseid)
         }
-        data.nickName = userInfo.data.nickName
-        data.timestamp = new Date(userInfo.data.timestamp).toLocaleString()
       }
     }
 

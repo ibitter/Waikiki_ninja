@@ -200,12 +200,8 @@ export default {
     }
 
     const CKLogin = async () => {
-      const ptKey =
-        data.cookie.match(/pt_key=(.*?);/) &&
-        data.cookie.match(/pt_key=(.*?);/)[1]
-      const ptPin =
-        data.cookie.match(/pt_pin=(.*?);/) &&
-        data.cookie.match(/pt_pin=(.*?);/)[1]
+      const ptKey = data.cookie.match(/pt_key=(.*?);/) && data.cookie.match(/pt_key=(.*?);/)[1]
+      const ptPin = data.cookie.match(/pt_pin=(.*?);/) && data.cookie.match(/pt_pin=(.*?);/)[1]
       if (ptKey && ptPin) {
         const body = await CKLoginAPI({ pt_key: ptKey, pt_pin: ptPin })
         if (body.data.eid) {
@@ -222,12 +218,8 @@ export default {
 
     // 新增 wskey登录
     const WSCKLogin = async () => {
-      const wskey =
-        data.jdwsck.match(/wskey=(.*?);/) &&
-        data.jdwsck.match(/wskey=(.*?);/)[1]
-      const pin =
-        data.jdwsck.match(/pin=(.*?);/) &&
-        data.jdwsck.match(/pin=(.*?);/)[1]
+      const wskey = data.jdwsck.match(/wskey=(.*?);/) && data.jdwsck.match(/wskey=(.*?);/)[1]
+      const pin = data.jdwsck.match(/pin=(.*?);/) && data.jdwsck.match(/pin=(.*?);/)[1]
       if (wskey && pin) {
         const body = await WSCKLoginAPI({ wskey: wskey, pin: pin })
         if (body.data.wseid) {

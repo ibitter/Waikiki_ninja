@@ -92,7 +92,7 @@ export default {
 
     let data = reactive({
       remark: '',
-      jdwsck: undefined,
+      jdwsck: '',
       nickName: undefined,
       timestamp: undefined,
       isSetWsck: false,

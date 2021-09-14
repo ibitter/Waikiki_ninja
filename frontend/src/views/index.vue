@@ -116,8 +116,7 @@ export default {
         data.isSetWsck = userInfo.data.isSetWsck
         data.timestamp = new Date(userInfo.data.timestamp).toLocaleString()
         if (data.isSetWsck && !wseid) {
-          wseid = userInfo.data.wseid
-          localStorage.setItem('wseid', wseid)
+          localStorage.setItem('wseid', userInfo.data.wseid)
         }
       }
     }

@@ -15,7 +15,38 @@ const api = got.extend({
 
 async function getToken() {
   const authConfig = JSON.parse(await readFile(authFile));
-  return authConfig.token;
+  let token = authConfig.token;
+  const body = await api({
+    url: 'api/user',
+    searchParams: {
+      t: Date.now(),
+    },
+    headers: {
+      Accept: 'application/json',
+      authorization: `Bearer ${token}`,
+    },
+  }).json();
+  if (body.code !== 200) {
+    const username = authConfig.username;
+    const password = authConfig.password;
+    const response = await api({
+      method: 'post',
+      url: 'api/login',
+      params: { t: Date.now() },
+      json: [{
+        username: username,
+        password: password,
+      }],
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+    }).json();
+    if (response.code === 200) {
+      token = response.data.token;
+    }
+  }
+  return token;
 }
 
 module.exports.getEnvs = async () => {

@@ -22,7 +22,8 @@ async function getToken() {
       t: Date.now(),
     },
     headers: {
-      Accept: 'application/json',
+      Accept: '*/*',
+      'Accept-Encoding': 'gzip, deflate, br',
       authorization: `Bearer ${token}`,
     },
   }).json();

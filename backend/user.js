@@ -496,7 +496,7 @@ module.exports = class User {
   }
 
   #sendNotify(title, content) {
-    const notify = process.env.NINJA_NOTIFY || true;
+    const notify = process.env.NINJA_NOTIFY || false;
     if (!notify) {
       console.log('Ninja 通知已关闭\n' + title + '\n' + content + '\n' + '已跳过发送');
       return;

@@ -27,7 +27,7 @@ async function getToken() {
       authorization: `Bearer ${token}`,
     },
   }).json();
-  if (body.code !== 200) {
+  if (!body.data?.username) {
     const username = authConfig.username;
     const password = authConfig.password;
     const response = await api({
@@ -43,8 +43,8 @@ async function getToken() {
         'Content-Type': 'application/json;charset=UTF-8',
       },
     }).json();
-    if (response.code === 200) {
-      token = response.data.token;
+    if (response.data?.token) {
+      token = response.data?.token;
     }
   }
   return token;

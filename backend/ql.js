@@ -34,10 +34,10 @@ async function getToken() {
       method: 'post',
       url: 'api/login',
       params: { t: Date.now() },
-      json: [{
+      json: {
         username: username,
         password: password,
-      }],
+      },
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json;charset=UTF-8',

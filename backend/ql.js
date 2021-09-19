@@ -9,7 +9,7 @@ const qlDir = process.env.QL_DIR || '/ql';
 const authFile = path.join(qlDir, 'config/auth.json');
 
 const api = got.extend({
-  prefixUrl: process.env.QL_URL || 'http://localhost:5600',
+  prefixUrl: process.env.QL_URL || 'http://localhost:5700',
   retry: { limit: 0 },
 });
 
@@ -27,7 +27,7 @@ async function getToken() {
       authorization: `Bearer ${token}`,
     },
   }).json();
-  if (!body.data?.username) {
+  if (body.code !== 200) {
     const username = authConfig.username;
     const password = authConfig.password;
     const response = await api({
@@ -43,7 +43,7 @@ async function getToken() {
         'Content-Type': 'application/json;charset=UTF-8',
       },
     }).json();
-    if (response.data?.token) {
+    if (response.code === 200) {
       token = response.data?.token;
     }
   }

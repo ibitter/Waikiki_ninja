@@ -27,7 +27,7 @@ async function getToken() {
       authorization: `Bearer ${token}`,
     },
   }).json();
-  if (body.code !== 200) {
+  if (token == '' || body.code !== 200) {
     const username = authConfig.username;
     const password = authConfig.password;
     const response = await api({

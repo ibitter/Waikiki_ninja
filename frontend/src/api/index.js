@@ -12,8 +12,16 @@ export function CKLoginAPI(body) {
   return api.post('cklogin', { json: body }).json()
 }
 
+export function getQQQrcodeAPI() {
+  return api.get('qqqrcode').json()
+}
+
 export function getQrcodeAPI() {
   return api.get('qrcode').json()
+}
+
+export function QQcheckLoginAPI(body) {
+  return api.post('qqcheck', { json: body }).json()
 }
 
 export function checkLoginAPI(body) {
@@ -38,7 +46,7 @@ export function WSCKLoginAPI(body) {
   return api.post('WSCKLogin', { json: body }).json()
 }
 
-export function getWSCKUserinfoAPI(wseid) {
+export function getWSCKUserinfoAPI(eid) {
   const searchParams = new URLSearchParams()
   searchParams.set('wseid', wseid)
   return api.get('WSCKUserinfo', { searchParams: searchParams }).json()

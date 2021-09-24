@@ -1,12 +1,13 @@
 /* eslint-disable camelcase */
 'use strict';
-
+const FormData = require('form-data');
 const got = require('got');
 const got1 = require('got');
 require('dotenv').config();
 const QRCode = require('qrcode');
-// 新增  , addWSCKEnv, delWSCKEnv, getWSCKEnvs, getWSCKEnvsCount, updateWSCKEnv enableEnv
-const { addEnv, delEnv, getEnvs, getEnvsCount, updateEnv , enableEnv , addWSCKEnv, delWSCKEnv, getWSCKEnvs, getWSCKEnvsCount, updateWSCKEnv } = require('./ql');
+const QQQRCode = require('qrcode');
+// 新增  , addWSCKEnv, delWSCKEnv, getWSCKEnvs, getWSCKEnvsCount, updateWSCKEnv
+const { addEnv, delEnv, getEnvs, getEnvsCount, updateEnv , addWSCKEnv, delWSCKEnv, getWSCKEnvs, getWSCKEnvsCount, updateWSCKEnv } = require('./ql');
 const path = require('path');
 const qlDir = process.env.QL_DIR || '/ql';
 const notifyFile = path.join(qlDir, 'shell/notify.sh');
@@ -35,11 +36,15 @@ module.exports = class User {
   token;
   okl_token;
   cookies;
+  sig;// 新增变量
+  redirectUrl;// 新增变量
+  tempCookie;// 新增变量
+  QQQRCode;// 新增变量
   QRCode;
   remark;
   #s_token;
   // 新增wskey构造入参
-  constructor({ token, okl_token, cookies, pt_key, pt_pin, cookie, eid, wseid, remarks, remark, ua, pin, wskey, jdwsck}) {
+  constructor({ token, okl_token, cookies, pt_key, pt_pin, cookie, eid, lSid, sig, redirectUrl, state, tempCookie, wseid, remarks, remark, ua, pin, wskey, jdwsck}) {
     this.token = token;
     this.okl_token = okl_token;
     this.cookies = cookies;
@@ -47,6 +52,9 @@ module.exports = class User {
     this.pt_pin = pt_pin;
     this.cookie = cookie;
     this.eid = eid;
+    this.sig = sig;
+    this.redirectUrl = redirectUrl;
+    this.tempCookie = tempCookie;
     this.wseid = wseid;
     this.remark = remark;
     this.ua = ua;
@@ -85,6 +93,62 @@ module.exports = class User {
       this.nickName = this.pin;
     }
 /////////////////////////////////////////////////
+  }
+  
+  async getQQQRConfig() {
+    this.ua = this.ua || process.env.NINJA_UA || GET_RANDOM_TIME_UA();
+    const taskQQUrl = ``;
+    const QQdata = await api({
+      method: 'POST',
+      url: taskQQUrl,
+      body: ``,
+      headers: {},
+    }).json();
+    
+    if (QQdata['code'] != 200) {
+      throw new Error(QQdata['message']);
+    }
+    if (bytes)
+      this.QQQRCode = 'data:image/png;base64,'+bytes;
+  }
+  
+  
+  async QQcheckQRLogin() {
+    if(true){
+      return {
+        errcode: 200,
+        message: '扫码登录已关闭，请自行抓包手动CK登录',
+      };
+    }
+    if (!this.sig || !this.redirectUrl || !this.state || !this.tempCookie || this.lSid) {
+      throw new Error('初始化登录请求失败！');
+    }
+    var form = new FormData();
+
+    const getQQCookieUrl = ``;
+    const QQresponse = await api({
+      method: 'POST',
+      url: getQQCookieUrl,
+      body: `sig=${this.sig}&type=1&redirectUrl=${this.redirectUrl}&state=${this.state}&lSid=${this.lSid}`,
+      body: form,
+      headers: {},
+    }).json();
+
+    if (QQresponse['code'] == 200) {
+      const QQresult = await this.CKLogin();
+      QQresult.errcode = 0;
+      return QQresult;
+    } else if (QQresponse['code'] == 500) {
+      return {
+        errcode: 555,
+        message: QQresponse['message'],
+      };
+    }
+
+    return {
+      errcode: 777,
+      message: QQresponse['message'],
+    };
   }
 
   async getQRConfig() {
@@ -425,6 +489,7 @@ module.exports = class User {
       marginWSCKCount: allowWSCKCount >= 0 ? allowWSCKCount : 0,
       allowAdd: Boolean(process.env.ALLOW_ADD) || false,
       allowWSCKAdd: Boolean(process.env.ALLOW_WSCK_ADD) || false,
+      showQQQR: Boolean(process.env.SHOW_QQQR) || false,
       showQR: Boolean(process.env.SHOW_QR) || false,
       showWSCK: Boolean(process.env.SHOW_WSCK) || false,
       showCK: Boolean(process.env.SHOW_CK) || false,

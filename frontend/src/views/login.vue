@@ -15,6 +15,31 @@
       </div>
       <div class="card-footet"></div>
     </div>
+    
+    <div v-if="showQQQR" class="card">
+      <div class="card-header">
+        <div class="flex items-center justify-between">
+          <p class="card-title">QQ扫码录入CK</p>
+          <span class="ml-2 px-2 py-1 bg-gray-200 rounded-full font-normal text-xs">余量：{{ marginCount }}</span>
+        </div>
+        <div class="card-body text-base leading-6">
+          <b>（1）使用jd绑定qq账号，（2）使用qq扫码登录京东！！</b>
+          <p>如果还是头铁没绑定，上方弹窗会返回一个链接让您绑定jd，绑定之后重新扫码即可</p>
+          <p>扫码之后可能会提示需要您进行安全验证，上方弹窗会返回一个链接提供安全验证，验证之后重新扫码即可！</p>
+          <b>轮询时间为8秒，请耐心等待。。。</b>
+        </div>
+        <span class="card-subtitle">
+          请点击下方按钮登录，点击按钮后回到本网站查看是否登录成功，京东的升级提示不用管。
+        </span>
+      </div>
+      <div class="card-body text-center">
+        <div v-if="!qrQQCodeVisibility" class="flex flex-col w-48 m-auto mt-4">
+          <el-button type="primary" round @click="showQQQrcode">扫描二维码登录</el-button>
+        </div>
+        <img v-else :src="QQQRCode" :width="256" class="m-auto" />
+      </div>
+      <div class="card-footer"></div>
+    </div>
 
     <div v-if="showQR" class="card">
       <div class="card-header">
@@ -53,6 +78,7 @@
           <p class="card-subtitle">——在api.m.jd.com域名下找POST请求大概率能找到wskey。</p>
           <p class="card-subtitle">wskey在录入后立马上线，系统会在指定时间检查wskey，有效则自动转换出cookie登录</p>
           <p class="card-subtitle">cookie失效后，也会在系统设定的指定时间内自动转换出新的cookie，实现一次录入长期有效</p>
+          <b>wskey会随着京东app的退出登录和更改密码而失效，清除app数据或者卸载软件不会影响。</b>
         </div>
         <span class="card-subtitle"> 请在下方输入您的 WSCK  </span>
       </div>
@@ -93,7 +119,9 @@ import { ElMessage } from 'element-plus'
 import {
   getInfoAPI,
   getQrcodeAPI,
+  getQQQrcodeAPI,
   CKLoginAPI,
+  QQcheckLoginAPI,
   checkLoginAPI,
   WSCKLoginAPI,
 } from '@/api/index'
@@ -108,16 +136,25 @@ export default {
       allowAdd: true,
       cookie: '',
       QRCode: undefined,
+      QQQRCode: undefined,
+      qrQQCodeVisibility: false,
       qrCodeVisibility: false,
       token: undefined,
       okl_token: undefined,
       cookies: undefined,
       timer: undefined,
+      QQtimer: undefined,
       waitLogin: false,
       //
+      sig: undefined,
+      redirectUrl: undefined,
+      state: undefined,
+      tempCookie: undefined,
+      lSid: undefined,
       marginWSCKCount: 0,
       allowWSCKAdd: true,
       jdwsck: '',
+      showQQQR:true,
       showQR:false,
       showWSCK:false,
       showCK:true,
@@ -130,12 +167,73 @@ export default {
       data.allowAdd = info.allowAdd
       data.marginWSCKCount = info.marginWSCKCount
       data.allowWSCKAdd = info.allowWSCKAdd
+      data.showQQQR = info.showQQQR
       data.showQR = info.showQR
       data.showWSCK = info.showWSCK
       data.showCK = info.showCK
 
     }
+    
+    const getQQQrcode = async () => {
+      // 增加扫码是否禁用判断
+      if (data.showQQQR || true) {
+        try {
+          const QQbody = await getQQQrcodeAPI()
+          data.sig = QQbody.data.sig
+          data.redirectUrl = QQbody.data.redirectUrl
+          data.stassste = QQbody.data.state
+          data.tempCookie = QQbody.data.tempCookie
+          data.lSid = QQbody.data.lSid
+          data.QQQRCode  = QQbody.data.QQQRCode 
+          if (data.QQQRCode ) {
+            // data.qrCodeVisibility = true
+            data.waitLogin = true
+            data.QQtimer = setInterval(QQckeckLogin, 1000) // 设置定时器
+          }
+        } catch (e) {
+          console.error(e)
+          ElMessage.error('生成二维码失败！请重试或放弃')
+        }
+      } else {
+        ElMessage.warning('QQ扫码已禁用请手动抓包')
+      }
 
+    }
+
+    const showQQQrcode = async () => {
+      data.qrQQCodeVisibility = true
+    }
+    
+    const QQckeckLogin = async () => {
+      try {
+        const QQbody1 = await QQcheckLoginAPI({
+          sig: data.sig,
+          redirectUrl: data.redirectUrl,
+          state: data.state,
+          tempCookie: data.tempCookie,
+          lSid: data.lSid,
+        })
+        
+        switch (QQbody1?.data.errcode) {
+          case 0:
+            localStorage.setItem('eid', QQbody1.data.eid)
+            ElMessage.success(QQbody1.message)
+            clearInterval(data.QQtimer)
+            break
+          case 777:
+            break
+          default:
+            ElMessage.error(QQbody1.message)
+            data.waitLogin = false
+            clearInterval(data.QQtimer)
+            break
+        }
+      } catch (error) {
+        clearInterval(data.QQtimer)
+        data.waitLogin = false
+      }
+    }
+    
     const getQrcode = async () => {
       // 增加扫码是否禁用判断
       if (data.showQR) {
@@ -156,7 +254,7 @@ export default {
           ElMessage.error('生成二维码失败！请重试或放弃')
         }
       } else {
-        ElMessage.warning('扫码已禁用请手动抓包')
+        ElMessage.warning('JD扫码已禁用请手动抓包')
       }
 
     }
@@ -207,6 +305,7 @@ export default {
         if (body.data.eid) {
           localStorage.setItem('eid', body.data.eid)
           ElMessage.success(body.message)
+          clearInterval(data.QQtimer)
           router.push('/')
         } else {
           ElMessage.error(body.message || 'cookie 解析失败，请检查后重试！')
@@ -225,6 +324,7 @@ export default {
         if (body.data.wseid) {
           localStorage.setItem('wseid', body.data.wseid)
           ElMessage.success(body.message)
+          clearInterval(data.QQtimer)
           router.push('/')
         } else {
           ElMessage.error(body.message || 'wskey 解析失败，请检查后重试！')
@@ -236,14 +336,18 @@ export default {
 
     onMounted(() => {
       getInfo()
-      getQrcode()
+      //getQrcode()
+      //getQQQrcode()
     })
 
     return {
       ...toRefs(data),
       getInfo,
+      getQQQrcode,
       getQrcode,
+      showQQQrcode,
       showQrcode,
+      QQckeckLogin,
       ckeckLogin,
       jumpLogin,
       CKLogin,
@@ -267,3 +371,4 @@ export default {
             color: red;
         }
 </style>
+

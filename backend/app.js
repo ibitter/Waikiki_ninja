@@ -1,5 +1,5 @@
 'use strict';
-
+const Formdata = require('form-data');
 const Koa = require('koa');
 const cors = require('@koa/cors');
 const Router = require('@koa/router');
@@ -47,6 +47,29 @@ router.get('/api/status', (ctx) => {
 router.get('/api/info', async (ctx) => {
   const data = await User.getPoolInfo();
   debugger
+  ctx.body = { data };
+});
+
+router.get('/api/qqqrcode', async (ctx) => {
+  const user = new User({});
+  await user.getQQQRConfig();
+  ctx.body = {
+    data: {
+      sig: user.sig,
+      redirectUrl: user.redirectUrl,
+      state: user.state,
+      tempCookie: user.tempCookie,
+      lSid: user.lSid,
+      ua: user.ua,
+      QQQRCode: user.QQQRCode,
+    },
+  };
+});
+
+router.post('/api/qqcheck', body(), async (ctx) => {
+  const body = ctx.request.body;
+  const user = new User(body);
+  const data = await user.QQcheckQRLogin();
   ctx.body = { data };
 });
 

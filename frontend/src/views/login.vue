@@ -154,10 +154,10 @@ export default {
       marginWSCKCount: 0,
       allowWSCKAdd: true,
       jdwsck: '',
-      showQQQR:true,
+      showQQQR:false,
       showQR:false,
       showWSCK:false,
-      showCK:true,
+      showCK:false,
 
     })
 
